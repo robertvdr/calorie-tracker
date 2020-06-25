@@ -1,7 +1,11 @@
 package com.robvdr;
 
+import java.util.List;
+import java.util.Scanner;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import com.robvdr.model.Food;
 import com.robvdr.model.FoodDAO;
 import com.robvdr.model.jdbc.JDBCFoodDAO;
 import com.robvdr.caloriecounter.view.Menu;
@@ -21,12 +25,10 @@ public class CalorieTrackerCLI {
 	private static final String FOOD_MENU_OPTION_ALL_FOODS = "Show all foods in database";
 	private static final String FOOD_MENU_OPTION_ADD_FOOD = "Add a new food";
 	private static final String FOOD_MENU_OPTION_SEARCH = "Search database for food";
-	private static final String FOOD_MENU_OPTION_MODIFY = "Edit an existing food";
 	private static final String FOOD_MENU_OPTION_DELETE = "Delete an unused food from the database";
 	private static final String[] FOOD_MENU_OPTIONS = new String[] { FOOD_MENU_OPTION_ALL_FOODS,
 																	 FOOD_MENU_OPTION_ADD_FOOD,
 																	 FOOD_MENU_OPTION_SEARCH,
-																	 FOOD_MENU_OPTION_MODIFY,
 																	 FOOD_MENU_OPTION_DELETE,
 																	 MENU_OPTION_RETURN_TO_MAIN}; 
 	
@@ -44,6 +46,8 @@ public class CalorieTrackerCLI {
 	
 	private Menu menu;
 	private FoodDAO foodDAO;
+	public Scanner input = new Scanner(System.in);
+	
 	
 	public static void main(String[] args) {
 		CalorieTrackerCLI application = new CalorieTrackerCLI();
@@ -64,6 +68,7 @@ public class CalorieTrackerCLI {
 	//main menu
 	private void run() {
 		while(true) {
+			System.out.println("");
 			System.out.println("Main Menu");
 			String choice = (String)menu.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 			if(choice.equals(MAIN_MENU_OPTION_FOODS)) {
@@ -73,7 +78,7 @@ public class CalorieTrackerCLI {
 			} else if (choice.equals(MAIN_MENU_OPTION_BMR)) {
 				handleBMR();
 			} else if (choice.equals(MAIN_MENU_OPTION_EXIT)) {
-				System.exit(0);
+				menu.exit();
 			}
 		}
 	}
@@ -83,17 +88,80 @@ public class CalorieTrackerCLI {
 		System.out.println("Food Database");
 		String choice = (String)menu.getChoiceFromOptions(FOOD_MENU_OPTIONS);
 		if(choice.equals(FOOD_MENU_OPTION_ALL_FOODS)) {
-			//handleListAllFoods();
+			handleAllFoods();
 		} else if (choice.equals(FOOD_MENU_OPTION_ADD_FOOD)) {
-			//handleAddFood();
+			handleAddFood();
 		} else if (choice.equals(FOOD_MENU_OPTION_SEARCH)) {
 			//handleSearchFoodDatabase();
-		} else if (choice.equals(FOOD_MENU_OPTION_MODIFY)) {
-			//handleModifyFood();
 		} else if (choice.equals(FOOD_MENU_OPTION_DELETE)) {
-			//handleDeleteFood();
+			handleDeleteFood();
 		}
 	}
+	
+	private void handleAllFoods() {
+		System.out.println("                                     ALL FOODS");
+		System.out.println("------------------------------------------------------------------------------------");
+		System.out.printf("%-20s %-17s %-12s %-12s %-12s %-12s \n", "NAME", "SERVING SIZE", "CALORIES(g)", "PROTEIN(g)", "CARBS(g)", "FAT(g)");
+		List<Food> allFoods = foodDAO.getAllFoods();
+		listFoods(allFoods);
+	}
+	
+	private void handleAddFood() {
+		System.out.println("Add New Food");
+		Food newFood = new Food();
+		String newFoodName = getUserInput("Enter food name");
+		newFood.setName(newFoodName);
+		String newFoodQuantity = getUserInput("Enter food quantity");
+		newFood.setQuantity(newFoodQuantity);
+		System.out.println("Enter food calories >>> ");
+		Double newFoodCalories = Double.parseDouble(input.nextLine());
+		newFood.setCalories(newFoodCalories);
+		System.out.println("Enter food protein >>> ");
+		Double newFoodProtein = Double.parseDouble(input.nextLine());
+		newFood.setProtein(newFoodProtein);
+		System.out.println("Enter food carbs >>> ");
+		Double newFoodCarbs = Double.parseDouble(input.nextLine());
+		newFood.setCarbs(newFoodCarbs);
+		System.out.println("Enter food fat >>> ");
+		Double newFoodFat = Double.parseDouble(input.nextLine());
+		newFood.setFat(newFoodFat);
+		newFood = foodDAO.addFood(newFood);
+		System.out.println("\n*** " + newFood.getName() + " created ***");
+	}
+	
+	private void handleDeleteFood() {
+		System.out.println("                                     ALL FOODS");
+		System.out.println("------------------------------------------------------------------------------------");
+		System.out.printf("%-20s %-17s %-12s \n", "FOOD ID", "NAME", "SERVING SIZE");
+		List<Food> allFoods = foodDAO.getAllFoodsForDelete();
+		listFoodsForDelete(allFoods);
+		System.out.print("\nEnter Food ID to be deleted >>> ");
+		int foodId = input.nextInt();
+		foodDAO.deleteFood(foodId);
+	}
+	
+	private void listFoods(List<Food> foods) {
+		if(foods.size() > 0) {
+			for (Food item : foods) {
+				System.out.printf("%-20s %-17s %-12s %-12s %-12s %-12s \n", item.getName(), item.getQuantity(), item.getCalories(), item.getProtein(), item.getCarbs(), item.getFat());
+			}
+		} else {
+			System.out.println("\n*** No results ***");
+		}
+	}
+	
+	private void listFoodsForDelete(List<Food> foods) {
+		if(foods.size() > 0) {
+			for (Food item : foods) {
+				System.out.printf("%-20d %-17s %-12s \n", item.getFoodId(), item.getName(), item.getQuantity());
+			}
+		} else {
+			System.out.println("\n*** No results ***");
+		}
+	}
+	
+
+
 	
 	//daily log sub-menu
 	private void handleLog() {
@@ -113,7 +181,17 @@ public class CalorieTrackerCLI {
 		System.out.println("BMR Calculator");
 		String choice = (String)menu.getChoiceFromOptions(BMR_MENU_OPTIONS);
 		if(choice.equals(BMR_MENU_OPTION_CALCULATE_BMR)) {
-			//handleCalculatBMR
+			BMRCalculator bmrCalculator = new BMRCalculator();
+			bmrCalculator.calculateBMR();
 		}
 	}
+	
+	@SuppressWarnings("resource")
+	private String getUserInput(String prompt) {
+		System.out.print(prompt + " >>> ");
+		return new Scanner(System.in).nextLine();
+	}
+	
+
+
 }

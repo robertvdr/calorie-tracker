@@ -3,6 +3,7 @@ package com.robvdr.model;
 public class Food {
 
 	// data types
+	private int foodId;
 	private String name;
 	private String quantity;
 	private double calories;
@@ -11,6 +12,14 @@ public class Food {
 	private double fat;
 
 	// getters and setters
+	public int getFoodId() {
+		return foodId;
+	}
+
+	public void setFoodId(int foodId) {
+		this.foodId = foodId;
+	}
+	
 	public String getName() {
 		return name;
 	}

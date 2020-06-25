@@ -6,6 +6,7 @@ public class BMRCalculator {
 
 	public void calculateBMR() {
 		Scanner input = new Scanner(System.in);
+		System.out.println("");
 		System.out.println("Enter sex: ");
 		String userSex = input.nextLine();
 		System.out.println("Enter weight: ");
@@ -30,7 +31,7 @@ public class BMRCalculator {
 		} else {
 			bmr = ((4.536 * userWeightDouble) + (15.88 * userHeightDouble) - (5 * userAgeDouble) + 5);
 		}
-		System.out.println("BMR: " + bmr);
+		System.out.println("BMR: " + bmr + "\n");
 	}
 
 }

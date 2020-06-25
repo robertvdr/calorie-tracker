@@ -50,4 +50,9 @@ public class Menu {
 		out.print("\nPlease choose an option >>> ");
 		out.flush();
 	}
+	
+	public void exit() {
+		in.close();
+		System.exit(0);
+	}
 }
