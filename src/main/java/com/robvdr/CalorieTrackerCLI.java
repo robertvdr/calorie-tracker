@@ -7,7 +7,10 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 import com.robvdr.model.Food;
 import com.robvdr.model.FoodDAO;
+import com.robvdr.model.Log;
+import com.robvdr.model.LogDAO;
 import com.robvdr.model.jdbc.JDBCFoodDAO;
+import com.robvdr.model.jdbc.JDBCLogDAO;
 import com.robvdr.caloriecounter.view.Menu;
 
 public class CalorieTrackerCLI {
@@ -33,11 +36,13 @@ public class CalorieTrackerCLI {
 																	 MENU_OPTION_RETURN_TO_MAIN}; 
 	
 	private static final String LOG_MENU_OPTION_ENTER_NEW = "Enter new food log";
-	private static final String LOG_MENU_OPTION_SHOW_TOTALS = "Show totals for a day";
+	private static final String LOG_MENU_OPTION_SHOW_DAY_TOTALS = "Show totals for a day";
 	private static final String LOG_MENU_OPTION_DELETE_ENTRY = "Delete food entry";
+	private static final String LOG_MENU_OPTION_SHOW_ALL_LOGS = "Display all logs";
 	private static final String[] LOG_MENU_OPTIONS = new String[] {LOG_MENU_OPTION_ENTER_NEW,
-																   LOG_MENU_OPTION_SHOW_TOTALS,
+																   LOG_MENU_OPTION_SHOW_DAY_TOTALS,
 																   LOG_MENU_OPTION_DELETE_ENTRY,
+																   LOG_MENU_OPTION_SHOW_ALL_LOGS,
 																   MENU_OPTION_RETURN_TO_MAIN};
 	
 	private static final String BMR_MENU_OPTION_CALCULATE_BMR = "Calculate BMR";
@@ -46,6 +51,7 @@ public class CalorieTrackerCLI {
 	
 	private Menu menu;
 	private FoodDAO foodDAO;
+	private LogDAO logDAO;
 	public Scanner input = new Scanner(System.in);
 	
 	
@@ -63,6 +69,7 @@ public class CalorieTrackerCLI {
 		dataSource.setPassword("postgres1");
 		
 		foodDAO = new JDBCFoodDAO(dataSource);
+		logDAO = new JDBCLogDAO(dataSource);
 	}
 	
 	//main menu
@@ -169,10 +176,30 @@ public class CalorieTrackerCLI {
 		String choice = (String)menu.getChoiceFromOptions(LOG_MENU_OPTIONS);
 		if(choice.equals(LOG_MENU_OPTION_ENTER_NEW)) {
 			//handleEnterNewLog();
-		} else if (choice.equals(LOG_MENU_OPTION_SHOW_TOTALS)) {
+		} else if (choice.equals(LOG_MENU_OPTION_SHOW_DAY_TOTALS)) {
 			//handleShowDayTotals();
 		} else if (choice.equals(LOG_MENU_OPTION_DELETE_ENTRY)) {
 			//handleDeleteLogEntry();
+		} else if (choice.equals(LOG_MENU_OPTION_SHOW_ALL_LOGS)) {
+			handleShowAllLogs();
+		}
+	}
+	
+	private void handleShowAllLogs() {
+		System.out.println("                                     ALL LOGS");
+		System.out.println("-------------------------------------------------------------------------------------------------");
+		System.out.printf("%-15s %-17s %-12s %-12s %-12s %-12s %-12s \n", "DATE", "NAME", "SERVING SIZE", "CALORIES(g)", "PROTEIN(g)", "CARBS(g)", "FAT(g)");
+		List<Log> allLogs = logDAO.getAllLogs();
+		listAllLogs(allLogs);
+	}
+	
+	private void listAllLogs(List<Log> logs) {
+		if(logs.size() > 0) {
+			for (Log item : logs) {
+				System.out.printf("%-15s %-17s %-12s %-12s %-12s %-12s %-12s \n", item.getDate(), item.getName(), item.getQuantity(), item.getCalories(), item.getProtein(), item.getCarbs(), item.getFat());
+			}
+		} else {
+			System.out.println("\n*** No results ***");
 		}
 	}
 	
