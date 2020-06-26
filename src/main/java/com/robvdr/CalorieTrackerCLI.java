@@ -175,7 +175,7 @@ public class CalorieTrackerCLI {
 		System.out.println("Daily Log");
 		String choice = (String)menu.getChoiceFromOptions(LOG_MENU_OPTIONS);
 		if(choice.equals(LOG_MENU_OPTION_ENTER_NEW)) {
-			//handleEnterNewLog();
+			handleEnterNewLog();
 		} else if (choice.equals(LOG_MENU_OPTION_SHOW_DAY_TOTALS)) {
 			//handleShowDayTotals();
 		} else if (choice.equals(LOG_MENU_OPTION_DELETE_ENTRY)) {
@@ -183,6 +183,17 @@ public class CalorieTrackerCLI {
 		} else if (choice.equals(LOG_MENU_OPTION_SHOW_ALL_LOGS)) {
 			handleShowAllLogs();
 		}
+	}
+	
+	private void handleEnterNewLog() {
+		Log newLog = new Log();
+		System.out.print("\nDate for log entry (ex: 2020/6/15) >>>");
+		newLog.setDate(input.nextLine());
+		handleAllFoods();
+		System.out.print("\nEnter ID number of food to add >>>");
+		newLog.setFoodId(input.nextInt());
+		newLog = logDAO.addEntry(newLog);
+		System.out.println("\n*** Log Entry Added ***");
 	}
 	
 	private void handleShowAllLogs() {

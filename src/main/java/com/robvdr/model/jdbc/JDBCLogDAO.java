@@ -20,9 +20,13 @@ public class JDBCLogDAO implements LogDAO {
 	}
 
 	@Override
-	public Log addEntry(Log newEntry) {
-		// TODO Auto-generated method stub
-		return null;
+	public Log addEntry(Log newLog) {
+		String sql = "INSERT INTO log (log_date, food_id) VALUES (?, ?) RETURNING log_id;";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, newLog.getDate(), newLog.getFoodId());
+		if(results.next()) {
+			newLog.setLogId(results.getInt("log_id"));
+		}
+		return newLog;
 	}
 
 	@Override
