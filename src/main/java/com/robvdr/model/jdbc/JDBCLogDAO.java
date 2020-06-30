@@ -30,9 +30,10 @@ public class JDBCLogDAO implements LogDAO {
 	}
 
 	@Override
-	public void deleteEntry(int logId) {
-		// TODO Auto-generated method stub
-		
+	public void deleteLogEntry(int logId) {
+		String sqlDeleteLog = "DELETE FROM log WHERE log_id = ?;";
+		jdbcTemplate.update(sqlDeleteLog, logId);
+		System.out.print("Deleted");;
 	}
 
 	@Override
@@ -58,6 +59,21 @@ public class JDBCLogDAO implements LogDAO {
 			allLogs.add(logResult);
 		}
 		return allLogs;
+	}
+
+	public List<Log> getAllLogsForDelete() {
+		List<Log> allLogsForDelete = new ArrayList<>();
+		String sqlAllLogsForDelete = "SELECT l.log_id, l.log_date, f.food_name, f.food_quantity FROM log l JOIN foods f ON l.food_id = f.food_id ORDER BY l.log_date DESC;";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlAllLogsForDelete);
+		while (results.next()) {
+			Log logResult = new Log();
+				logResult.setLogId(results.getInt("log_id"));
+				logResult.setDate(results.getString("log_date"));
+				logResult.setName(results.getString("food_name"));
+				logResult.setQuantity(results.getString("food_quantity"));
+				allLogsForDelete.add(logResult);
+		}
+		return allLogsForDelete;
 	}
 
 }

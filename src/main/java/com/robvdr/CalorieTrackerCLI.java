@@ -179,7 +179,7 @@ public class CalorieTrackerCLI {
 		} else if (choice.equals(LOG_MENU_OPTION_SHOW_DAY_TOTALS)) {
 			//handleShowDayTotals();
 		} else if (choice.equals(LOG_MENU_OPTION_DELETE_ENTRY)) {
-			//handleDeleteLogEntry();
+			handleDeleteLogEntry();
 		} else if (choice.equals(LOG_MENU_OPTION_SHOW_ALL_LOGS)) {
 			handleShowAllLogs();
 		}
@@ -204,10 +204,31 @@ public class CalorieTrackerCLI {
 		listAllLogs(allLogs);
 	}
 	
+	private void handleDeleteLogEntry() {
+		System.out.println("                                     ALL LOGS");
+		System.out.println("-------------------------------------------------------------------------------------------------");
+		System.out.printf("%-10s %-15s %-12s %-12s \n", "LOG ID", "DATE", "NAME", "QUANTITY");
+		List<Log> allLogsForDelete = logDAO.getAllLogsForDelete();
+		listLogsForDelete(allLogsForDelete);
+		System.out.print("\nEnter Log ID to be deleted >>> ");
+		int logId = input.nextInt();
+		logDAO.deleteLogEntry(logId);
+	}
+	
 	private void listAllLogs(List<Log> logs) {
 		if(logs.size() > 0) {
 			for (Log item : logs) {
 				System.out.printf("%-15s %-17s %-12s %-12s %-12s %-12s %-12s \n", item.getDate(), item.getName(), item.getQuantity(), item.getCalories(), item.getProtein(), item.getCarbs(), item.getFat());
+			}
+		} else {
+			System.out.println("\n*** No results ***");
+		}
+	}
+	
+	private void listLogsForDelete(List<Log> logs) {
+		if(logs.size() > 0) {
+			for (Log item : logs) {
+				System.out.printf("%-10s %-15s %-12s %-12s \n", item.getLogId(), item.getDate(), item.getName(), item.getQuantity());
 			}
 		} else {
 			System.out.println("\n*** No results ***");
